@@ -1,0 +1,6 @@
+Esta é mais uma forma de gerar arquivo  Utilizando a classe FileWriter
+
+ Neste código também é gerada nova linha 
+     Utilizando tanto o newLine() como também System.lineSeparator() do java.lang
+
+FIM

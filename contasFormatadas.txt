@@ -1,0 +1,4 @@
+CC   	22  	 33       Nico Steppat                               210,10
+CP   	11  	 55       Luan Silva                                1300,98
+CC   	22  	 44       Ana Garcias                                350,40
+CC   	1231	 2039989  José Luiz Gonçalves                        350,40
