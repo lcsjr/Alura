@@ -1,10 +1,10 @@
 package br.com.diversos.code.email;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -23,11 +23,8 @@ public class Email {
 
 	public void enviaEmailComAnexos(String destinatarios, String assuntoEmail, String corpoEmailString) throws UnsupportedEncodingException {
 
-//		FuncionalidadesUteis utilidade = new FuncionalidadesUteis();
-
-		//String to = destinatarios;
+		String fileName = "./target/comparacao_TabelasDinamicas.zip";
 		String from = "tr.automation.webdriver@gmail.com";
-
 		final String username = "tr.automation.br@gmail.com";
 		final String password = "Autom@t1on";
 		String host = "smtp.gmail.com";
@@ -46,65 +43,38 @@ public class Email {
 		});
 
         /** Ativa Debug para sessão */
-        session.setDebug(true);
-        
+        session.setDebug(false);
 		try {
 
+			Address[] toUser = InternetAddress.parse(destinatarios);
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(from));
-			
-			Address[] toUser = InternetAddress //Destinatário(s)
-                    .parse(destinatarios); 
-			
 			message.setRecipients(Message.RecipientType.TO, toUser);
 			message.setSubject(assuntoEmail);
-			message.setText(corpoEmailString);
 			
+			BodyPart messageBodyPart1 = new MimeBodyPart();
+			messageBodyPart1.setText(corpoEmailString);
+						
+			BodyPart messageBodyPart2 = new MimeBodyPart();			
+			FileDataSource source = new FileDataSource(fileName);
+			messageBodyPart2.setDataHandler(new DataHandler(source));
+			messageBodyPart2.setFileName(source.getName());			
+
+			Multipart multipart = new MimeMultipart();
+			multipart.addBodyPart(messageBodyPart1);
+			multipart.addBodyPart(messageBodyPart2);
 			
-//			BodyPart messageBodyPart = new MimeBodyPart();
-//			BodyPart messageBodyPart2 = new MimeBodyPart();
-//
-//			messageBodyPart.setText(corpoEmailString);
-//
-//			Multipart multipart = new MimeMultipart();
-//			multipart.addBodyPart(messageBodyPart);
-//
-//			messageBodyPart = new MimeBodyPart();
-//			String filename = "aulaAlura.txt";
-//			DataSource source = new FileDataSource(filename);
-//			messageBodyPart.setDataHandler(new DataHandler(source));
-//			messageBodyPart.setFileName(filename);
-//
-//			//if (utilidade.pastaVazia("./evidencias/integracao") == false || utilidade.pastaVazia("./evidencias/screenshot") == false || utilidade.pastaVazia("./evidencias/WS") == false) {
-//
-////				String anexoEvidencias = zipaEvidencias();
-////				messageBodyPart2 = new MimeBodyPart();
-////				String filename2 = anexoEvidencias;
-////				DataSource source2 = new FileDataSource(filename2);
-////				messageBodyPart2.setDataHandler(new DataHandler(source2));
-////				messageBodyPart2.setFileName("comparacao.zip");
-////				multipart.addBodyPart(messageBodyPart2);
-//			//}
-//
-//			multipart.addBodyPart(messageBodyPart);
-//
-//			message.setContent(multipart);
+			message.setContent(multipart);
+			message.setSentDate(new Date());
 			Transport.send(message);
 
-//			logger.info(String.format("--------------------------------------------------------------------------------------------------------------------------------"));
-//			logger.info("E-MAIL COM AS INFORMAÇÕES DA SUITE ENVIADO COM SUCESSO! ");
-//			logger.info(String.format("--------------------------------------------------------------------------------------------------------------------------------"));
-
-		} catch (MessagingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public String zipaEvidencias() {
-		String[] u = null;
-		Zip.main(u);
-		String evidenciasZip = "./testeZipar/comparacao.zip";
-		return evidenciasZip;
+		} catch (MessagingException mex) {
+		      mex.printStackTrace();
+		      Exception ex = null;
+		      if ((ex = mex.getNextException()) != null) {
+		    	  ex.printStackTrace();
+		      }
+		  }
 	}
 	
 }

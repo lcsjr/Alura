@@ -12,8 +12,8 @@ import java.util.zip.ZipOutputStream;
 public class Zip {
 
 	private List<String> fileList;
-	private static final String OUTPUT_ZIP_FILE = "./testeZipar/comparacao.zip";
-	private static final String SOURCE_FOLDER = "./testeZipar"; 
+	private static final String OUTPUT_ZIP_FILE = "./target/comparacao_TabelasDinamicas.zip";
+	private static final String SOURCE_FOLDER = "./target"; 
 
 	public Zip() {
 		fileList = new ArrayList<String>();
@@ -43,18 +43,20 @@ public class Zip {
 			FileInputStream in = null;
 
 			for (String file : this.fileList) {
-				System.out.println("File Added : " + source + " " + file);
-				ZipEntry ze = new ZipEntry(source + File.separator + file);
-				zos.putNextEntry(ze);
-				try {
-					System.out.println(SOURCE_FOLDER);
-					in = new FileInputStream(SOURCE_FOLDER + File.separator + file);
-					int len;
-					while ((len = in.read(buffer)) > 0) {
-						zos.write(buffer, 0, len);
+				if (file.contains(".xls")) {
+					System.out.println("File Added : " + source + " " + file);
+					ZipEntry ze = new ZipEntry(source + File.separator + file);
+					zos.putNextEntry(ze);
+					try {
+						System.out.println(SOURCE_FOLDER);
+						in = new FileInputStream(SOURCE_FOLDER + File.separator + file);
+						int len;
+						while ((len = in.read(buffer)) > 0) {
+							zos.write(buffer, 0, len);
+						}
+					} finally {
+						in.close();
 					}
-				} finally {
-					in.close();
 				}
 			}
 
@@ -74,18 +76,31 @@ public class Zip {
 
 	public void generateFileList(File node) {
 
-		// add file only
-		if (node.isFile()) {
-			fileList.add(generateZipEntry(node.toString()));
+		File afiles[] = node.listFiles();
+		
+		int i = 0;
+		for (int j = afiles.length; i < j; i++) {
+			File arquivos = afiles[i];
 
-		}
+			Boolean extensao = arquivos.getName().toLowerCase().endsWith(".xls");
 
-		if (node.isDirectory()) {
-			String[] subNote = node.list();
-			for (String filename : subNote) {
-				generateFileList(new File(node, filename));
+			if (extensao && !arquivos.isHidden()) {
+				fileList.add(arquivos.getName());
 			}
 		}
+		
+//		// add file only
+//		if (node.isFile()) {
+//			fileList.add(generateZipEntry(node.toString()));
+//
+//		}
+//
+//		if (node.isDirectory()) {
+//			String[] subNote = node.list();
+//			for (String filename : subNote) {
+//				generateFileList(new File(node, filename));
+//			}
+//		}
 	}
 
 	private String generateZipEntry(String file) {
